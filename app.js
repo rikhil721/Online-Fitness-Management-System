@@ -12,9 +12,32 @@ function getSupabase() {
 }
 
 // ---------------------------------------
+// TOAST NOTIFICATION FUNCTION
+// ---------------------------------------
+function showToast(message, isError = false) {
+    const toast = document.getElementById("toast");
+    if (toast) {
+        toast.textContent = message;
+        toast.style.display = "block";
+        // Red for duplicate/errors, Green for success
+        toast.style.backgroundColor = isError ? "#c0392b" : "#27ae60";
+        toast.style.color = "#ffffff";
+
+        if (window.toastTimeout) {
+            clearTimeout(window.toastTimeout);
+        }
+
+        window.toastTimeout = setTimeout(function() {
+            toast.style.display = "none";
+        }, 3500);
+    } else {
+        alert(message);
+    }
+}
+
+// ---------------------------------------
 // PERSONAL TRAINING
 // ---------------------------------------
-
 const programSelect = document.getElementById("program");
 const trainerSelect = document.getElementById("trainerSelect");
 
@@ -35,7 +58,6 @@ if (programSelect && trainerSelect) {
 // ---------------------------------------
 // DATE VALIDATION
 // ---------------------------------------
-
 const dateInput = document.getElementById("date");
 
 if (dateInput) {
@@ -45,7 +67,7 @@ if (dateInput) {
         today.setHours(0, 0, 0, 0);
 
         if (selectedDate < today) {
-            alert("Invalid date. Please select today or a future date.");
+            showToast("Invalid date. Please select today or a future date.", true);
             dateInput.value = "";
         }
     });
@@ -54,7 +76,6 @@ if (dateInput) {
 // ---------------------------------------
 // TIME VALIDATION
 // ---------------------------------------
-
 const timeInput = document.getElementById("time");
 
 if (timeInput && dateInput) {
@@ -63,7 +84,7 @@ if (timeInput && dateInput) {
         const selectedTime = timeInput.value;
 
         if (!selectedDate) {
-            alert("Please select a date first.");
+            showToast("Please select a date first.", true);
             timeInput.value = "";
             return;
         }
@@ -87,7 +108,7 @@ if (timeInput && dateInput) {
                 selectedHours < currentHours ||
                 (selectedHours === currentHours && selectedMinutes <= currentMinutes)
             ) {
-                alert("Invalid time. Please select a future time.");
+                showToast("Invalid time. Please select a future time.", true);
                 timeInput.value = "";
             }
         }
@@ -95,9 +116,8 @@ if (timeInput && dateInput) {
 }
 
 // ---------------------------------------
-// PERSONAL BOOKING (WITH DUPLICATE CHECK)
+// PERSONAL BOOKING (WITH TOAST DUPLICATE NOTICE)
 // ---------------------------------------
-
 const bookingForm = document.getElementById("booking-form");
 
 if (bookingForm) {
@@ -112,13 +132,13 @@ if (bookingForm) {
         const time = timeInput.value;
 
         if (!name || !email || !programValue || !trainerValue || !date || !time) {
-            alert("Please fill in all fields.");
+            showToast("Please fill in all fields.", true);
             return;
         }
 
         const client = getSupabase();
         if (!client) {
-            alert("Error: Supabase is not connected. Make sure the script tag is in index.html");
+            showToast("Error: Supabase connection failed.", true);
             return;
         }
 
@@ -130,7 +150,7 @@ if (bookingForm) {
         else if (programValue === "weightloss") price = 450;
         else if (programValue === "personal") price = 800;
 
-        // 1. Check for duplicate booking first
+        // Check duplicate booking first
         client
             .from("bookings")
             .select("id")
@@ -139,11 +159,11 @@ if (bookingForm) {
             .eq("time", time)
             .then(function(checkRes) {
                 if (checkRes.data && checkRes.data.length > 0) {
-                    alert("Duplicate booking! You already have a booking scheduled for this date and time.");
+                    showToast("Duplicate booking! Slot already reserved.", true);
                     return;
                 }
 
-                // 2. Insert into Supabase
+                // Insert to Supabase
                 client
                     .from("bookings")
                     .insert([
@@ -160,9 +180,9 @@ if (bookingForm) {
                     .then(function(insertRes) {
                         if (insertRes.error) {
                             if (insertRes.error.code === "23505") {
-                                alert("Duplicate booking! You already have a booking scheduled for this date and time.");
+                                showToast("Duplicate booking! Slot already reserved.", true);
                             } else {
-                                alert("Database Error: " + insertRes.error.message);
+                                showToast("Database error: " + insertRes.error.message, true);
                             }
                             return;
                         }
@@ -181,8 +201,7 @@ if (bookingForm) {
                         const sPrice = document.getElementById("summaryPrice");
                         if (sPrice) sPrice.textContent = price;
 
-                        alert("Booking confirmed and successfully saved to Supabase!");
-                        showToast("Personal Training Booked Successfully!");
+                        showToast("Booking confirmed and saved to Supabase!");
 
                         bookingForm.reset();
                         trainerSelect.innerHTML = '<option value="">Select Trainer</option>';
@@ -194,7 +213,6 @@ if (bookingForm) {
 // ---------------------------------------
 // GROUP TRAINING
 // ---------------------------------------
-
 const groupButtons = document.querySelectorAll(".group-book-btn");
 
 groupButtons.forEach(function(button) {
@@ -212,7 +230,7 @@ groupButtons.forEach(function(button) {
         const email = emailInput ? emailInput.value.trim() : "";
 
         if (!name || !email) {
-            alert("Please enter your name and email first.");
+            showToast("Please enter your name and email first.", true);
             return;
         }
 
@@ -226,7 +244,6 @@ groupButtons.forEach(function(button) {
 
         const client = getSupabase();
         if (client) {
-            // Check duplicate
             client
                 .from("bookings")
                 .select("id")
@@ -235,7 +252,7 @@ groupButtons.forEach(function(button) {
                 .eq("time", displayTime)
                 .then(function(checkRes) {
                     if (checkRes.data && checkRes.data.length > 0) {
-                        alert("Duplicate booking! You already have a booking for this session.");
+                        showToast("Duplicate booking! Slot already reserved.", true);
                         return;
                     }
 
@@ -255,9 +272,9 @@ groupButtons.forEach(function(button) {
                         .then(function(insertRes) {
                             if (insertRes.error) {
                                 if (insertRes.error.code === "23505") {
-                                    alert("Duplicate booking! You already reserved this session.");
+                                    showToast("Duplicate booking! Slot already reserved.", true);
                                 } else {
-                                    alert("Database Error: " + insertRes.error.message);
+                                    showToast("Database error: " + insertRes.error.message, true);
                                 }
                                 return;
                             }
@@ -275,8 +292,7 @@ groupButtons.forEach(function(button) {
                             const sPrice = document.getElementById("summaryPrice");
                             if (sPrice) sPrice.textContent = price;
 
-                            alert("Group session booked and saved to Supabase!");
-                            showToast("Group Training Booked Successfully!");
+                            showToast("Group session booked and saved to Supabase!");
                         });
                 });
         }
@@ -286,7 +302,6 @@ groupButtons.forEach(function(button) {
 // ---------------------------------------
 // FIND NEXT SESSION DAY
 // ---------------------------------------
-
 function getNextDay(dayName) {
     const days = [
         "Sunday", "Monday", "Tuesday", "Wednesday",
@@ -311,26 +326,8 @@ function getNextDay(dayName) {
 }
 
 // ---------------------------------------
-// TOAST FUNCTION
-// ---------------------------------------
-
-function showToast(message) {
-    const toast = document.getElementById("toast");
-    if (toast) {
-        toast.textContent = message;
-        toast.style.display = "block";
-
-        setTimeout(function() {
-            toast.style.display = "none";
-            toast.textContent = "Booking Confirmed Successfully!";
-        }, 3000);
-    }
-}
-
-// ---------------------------------------
 // HERO BUTTONS
 // ---------------------------------------
-
 const programBtn = document.getElementById("programBtn");
 if (programBtn) {
     programBtn.addEventListener("click", function() {

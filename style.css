@@ -56,7 +56,7 @@ header, section {
     color: #c85a32;
 }
 
-/* --- Hero Header --- */
+/*  Hero Header  */
 header#home {
     max-width: 1080px;
     margin: 20px auto 26px auto;
@@ -91,7 +91,7 @@ header#home p {
     gap: 12px;
 }
 
-/* --- Content Sections & Cards --- */
+/*  Content Sections & Cards  */
 main {
     max-width: 1080px;
     margin: 0 auto;
@@ -114,7 +114,7 @@ h2 {
     padding-bottom: 8px;
 }
 
-/* --- Program Badges --- */
+/*  Program Badges  */
 .program-list {
     list-style-type: none;
     padding: 0;
@@ -168,7 +168,7 @@ tr:nth-child(even) {
     display: grid;
     grid-template-columns: 3fr 2fr;
     gap: 28px;
-    align-items: start; /* Prevents the summary card from stretching vertically */
+    align-items: start; 
 }
 
 @media (max-width: 768px) {

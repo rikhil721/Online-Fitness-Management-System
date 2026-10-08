@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitLife - Fitness App</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <body>
+    <!-- Floating macOS Nav -->
+    <nav class="main-nav">
+      <div class="nav-container">
+        <div class="logo">FitLife</div>
+        <div class="nav-links">
+          <a href="#home">Home</a>
+          <a href="#about">About</a>
+          <a href="#programs">Programs</a>
+          <a href="#trainers">Trainers</a>
+          <a href="#schedule">Schedule</a>
+          <a href="#booking">Book Now</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Header -->
+    <header id="home">
+      <h1>Welcome to FitLife</h1>
+      <h2>Online Fitness Management System</h2>
+      <p>Manage your workouts, trainers and fitness sessions in one place.</p>
+      <div class="hero-buttons">
+        <button id="programBtn">View Programs</button>
+        <button id="bookBtn">Book a Session</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- About Section -->
+      <section id="about">
+        <h2>About FitLife</h2>
+        <p>FitLife is a modern fitness management system designed to streamline workout schedules, personal trainer bookings, and tailored fitness tracking all in one workspace.</p>
+      </section>
+
+      <!-- Programs Section -->
+      <section id="programs">
+        <h2>Fitness Programs</h2>
+        <ul class="program-list">
+          <li>Strength Training</li>
+          <li>Cardio Training</li>
+          <li>Yoga</li>
+          <li>Weight Loss</li>
+          <li>Personal Training</li>
+        </ul>
+      </section>
+
+      <!-- Trainers Section (Fixed ID) -->
+      <section id="trainers">
+        <h2>Our Trainers</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Specialization</th>
+                <th>Experience</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Rahul Sharma</td>
+                <td>Strength Training</td>
+                <td>5 Years</td>
+              </tr>
+              <tr>
+                <td>Priya Menon</td>
+                <td>Yoga</td>
+                <td>4 Years</td>
+              </tr>
+              <tr>
+                <td>Arjun Kumar</td>
+                <td>Cardio</td>
+                <td>6 Years</td>
+              </tr>
+              <tr>
+                <td>Ananya Rao</td>
+                <td>Weight Loss</td>
+                <td>3 Years</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Schedule Section -->
+      <section id="schedule">
+        <h2>Workout Schedule</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Day</th>
+                <th>Time</th>
+                <th>Program</th>
+                <th>Trainer</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Monday</td>
+                <td>6:00 AM - 7:00 AM</td>
+                <td>Strength Training</td>
+                <td>Rahul Sharma</td>
+              </tr>
+              <tr>
+                <td>Tuesday</td>
+                <td>7:00 AM - 8:00 AM</td>
+                <td>Yoga</td>
+                <td>Priya Menon</td>
+              </tr>
+              <tr>
+                <td>Wednesday</td>
+                <td>6:00 PM - 7:00 PM</td>
+                <td>Cardio Training</td>
+                <td>Arjun Kumar</td>
+              </tr>
+              <tr>
+                <td>Thursday</td>
+                <td>5:00 PM - 6:00 PM</td>
+                <td>Weight Loss</td>
+                <td>Ananya Rao</td>
+              </tr>
+              <tr>
+                <td>Friday</td>
+                <td>6:00 AM - 7:00 AM</td>
+                <td>Personal Training</td>
+                <td>Rahul Sharma</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Booking Section -->
+      <section id="booking">
+        <h2>Book a Session</h2>
+        <div class="booking-grid">
+          <div class="booking-form">
+            <form id="booking-form">
+              <label for="name">Name</label>
+              <input type="text" id="name" placeholder="Enter your full name" required>
+
+              <label for="email">Email</label>
+              <input type="email" id="email" placeholder="name@example.com" required>
+
+              <label for="program">Program</label>
+              <select id="program" required>
+                <option value="strength">Strength Training</option>
+                <option value="cardio">Cardio Training</option>
+                <option value="yoga">Yoga</option>
+                <option value="weightloss">Weight Loss</option>
+                <option value="personal">Personal Training</option>
+              </select>
+
+              <label for="trainerSelect">Select Trainer</label>
+              <select id="trainerSelect" required>
+                <option value="">Select Trainer</option>
+                <option value="rahul">Rahul Sharma</option>
+                <option value="priya">Priya Menon</option>
+                <option value="arjun">Arjun Kumar</option>
+                <option value="ananya">Ananya Rao</option>
+              </select>
+
+              <label for="date">Select Date</label>
+              <input type="date" id="date" required>
+
+              <label for="time">Select Time</label>
+              <select id="time" required>
+                <option value="">Select Time</option>
+                <option>7:00 AM</option>
+                <option>9:00 AM</option>
+                <option>5:00 PM</option>
+                <option>7:00 PM</option>
+              </select>
+              
+              <button type="submit">Confirm Booking</button>
+            </form>
+          </div>
+
+          <div class="booking-summary">
+            <h3>Booking Summary</h3>
+            <p><strong>Name:</strong> <span id="summaryName">-</span></p>
+            <p><strong>Program:</strong> <span id="summaryProgram">-</span></p>
+            <p><strong>Trainer:</strong> <span id="summaryTrainer">-</span></p>
+            <p><strong>Date:</strong> <span id="summaryDate">-</span></p>
+            <p><strong>Time:</strong> <span id="summaryTime">-</span></p>
+            <div class="price-badge">
+              <strong>Total Fee:</strong> <span>₹<span id="summaryPrice">0</span></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <p id="toast">Booking Confirmed Successfully!</p>
+    </main>
+
+    <footer>
+      <p>&copy; 2026 FitLife Center. All rights reserved. CSE E10</p>
+      <nav class="footer-nav">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#programs">Programs</a>
+        <a href="#trainers">Trainers</a>
+        <a href="#schedule">Schedule</a>
+        <a href="#booking">Book Now</a>
+      </nav>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,4 +1,8 @@
 /* --- Global & Smooth Scroll --- */
+* {
+    box-sizing: border-box;
+}
+
 html {
     scroll-behavior: smooth;
 }
@@ -6,37 +10,46 @@ html {
 body {
     background-color: #f4f6f1;
     color: #2b3327;
-    font-family: Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     margin: 0;
-    padding: 20px;
+    padding: 20px 16px;
+    line-height: 1.6;
+}
+
+header, section {
+    scroll-margin-top: 85px;
 }
 
 /* --- Navigation Bar --- */
 .main-nav {
     position: sticky;
-    top: 10px;
-    z-index: 10;
+    top: 12px;
+    z-index: 100;
+    max-width: 1080px;
+    margin: 0 auto;
 }
 
 .nav-container {
     background-color: #384a32;
-    padding: 15px 30px;
-    border-radius: 30px;
+    padding: 12px 28px;
+    border-radius: 35px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
 .logo {
     color: #ffffff;
-    font-size: 20px;
+    font-size: 1.25rem;
     font-weight: bold;
 }
 
 .nav-links a {
     color: #e5ece0;
     text-decoration: none;
-    margin-left: 20px;
+    margin-left: 18px;
+    font-size: 0.95rem;
 }
 
 .nav-links a:hover {
@@ -45,72 +58,87 @@ body {
 
 /* --- Hero Header --- */
 header#home {
+    max-width: 1080px;
+    margin: 20px auto 26px auto;
     background-color: #e2ebd8;
     text-align: center;
     padding: 50px 20px;
-    margin: 20px 0;
-    border-radius: 20px;
+    border-radius: 24px;
     border: 1px solid #d0dcc6;
 }
 
 header#home h1 {
     color: #2b3327;
-    margin-bottom: 10px;
+    font-size: 2.5rem;
+    margin: 0 0 8px 0;
 }
 
 header#home h2 {
     color: #4b6243;
-    margin-bottom: 15px;
+    font-size: 1.25rem;
+    margin: 0 0 14px 0;
 }
 
 header#home p {
     color: #4b5447;
-    margin-bottom: 25px;
+    max-width: 600px;
+    margin: 0 auto 22px auto;
 }
 
-.hero-buttons button {
-    margin: 0 5px;
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
 }
 
 /* --- Content Sections & Cards --- */
+main {
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
 section {
     background-color: #ffffff;
     padding: 30px;
-    margin-bottom: 25px;
-    border-radius: 20px;
+    margin-bottom: 24px;
+    border-radius: 22px;
     border: 1px solid #dcdfd8;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
 }
 
 h2 {
     color: #384a32;
     margin-top: 0;
+    margin-bottom: 18px;
     border-bottom: 2px solid #eef2ea;
-    padding-bottom: 10px;
+    padding-bottom: 8px;
 }
 
 /* --- Program Badges --- */
 .program-list {
     list-style-type: none;
     padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .program-list li {
-    display: inline-block;
     background-color: #f0f5eb;
     color: #384a32;
-    padding: 10px 20px;
-    margin: 5px;
-    border-radius: 20px;
+    padding: 10px 22px;
+    border-radius: 25px;
     border: 1px solid #d4ded0;
     font-weight: bold;
+    font-size: 0.95rem;
 }
 
 /* --- Tables --- */
 .table-container {
-    border-radius: 15px;
+    border-radius: 16px;
     overflow: hidden;
     border: 1px solid #dcdfd8;
-    margin-top: 15px;
+    margin-top: 14px;
 }
 
 table {
@@ -121,12 +149,12 @@ table {
 th {
     background-color: #384a32;
     color: #ffffff;
-    padding: 12px;
+    padding: 14px 16px;
     text-align: left;
 }
 
 td {
-    padding: 12px;
+    padding: 12px 16px;
     border-bottom: 1px solid #eef2ea;
     color: #333333;
 }
@@ -135,56 +163,88 @@ tr:nth-child(even) {
     background-color: #f9fbf8;
 }
 
-/* --- Booking Form & Summary --- */
+/* --- Booking Form & Summary (Fixed Layout) --- */
 .booking-grid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 28px;
+    align-items: start; /* Prevents the summary card from stretching vertically */
+}
+
+@media (max-width: 768px) {
+    .booking-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.booking-form form {
     display: flex;
-    gap: 30px;
-    flex-wrap: wrap;
-}
-
-.booking-form {
-    flex: 2;
-    min-width: 280px;
-}
-
-.booking-summary {
-    flex: 1;
-    min-width: 250px;
-    background-color: #f7f9f5;
-    padding: 20px;
-    border-radius: 20px;
-    border: 1px solid #dcdfd8;
+    flex-direction: column;
+    gap: 10px;
 }
 
 label {
-    display: block;
-    margin-top: 10px;
     font-weight: bold;
+    font-size: 0.9rem;
     color: #384a32;
+    margin-top: 4px;
 }
 
 input, select {
     width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border-radius: 10px;
-    border: 1px solid #c5cec1;
-    box-sizing: border-box;
+    padding: 11px 14px;
+    border-radius: 12px;
+    border: 1px solid #cad4c6;
+    background-color: #fcfdfb;
+    font-size: 0.95rem;
 }
 
 input:focus, select:focus {
     border-color: #c85a32;
     outline: none;
+    box-shadow: 0 0 0 2px rgba(200, 90, 50, 0.15);
+}
+
+.booking-summary {
+    background-color: #f7f9f5;
+    padding: 24px;
+    border-radius: 20px;
+    border: 1px solid #dcdfd8;
+}
+
+.booking-summary h3 {
+    margin-top: 0;
+    color: #384a32;
 }
 
 .booking-summary p {
+    margin: 10px 0;
     border-bottom: 1px dashed #dcdfd8;
     padding-bottom: 8px;
+    font-size: 0.95rem;
 }
 
 .booking-summary span {
-    color: #c85a32;
+    color: #2b3327;
     font-weight: bold;
+}
+
+.price-badge {
+    margin-top: 16px;
+    background-color: #faede7;
+    border: 1px solid #f3cfc2;
+    padding: 12px 16px;
+    border-radius: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #a6421e;
+}
+
+.price-badge span {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #c85a32;
 }
 
 /* --- Buttons --- */
@@ -194,9 +254,15 @@ button {
     padding: 12px 24px;
     border: none;
     border-radius: 25px;
-    font-size: 15px;
+    font-size: 0.95rem;
     font-weight: bold;
     cursor: pointer;
+    transition: 0.15s ease;
+}
+
+button[type="submit"] {
+    margin-top: 10px;
+    width: fit-content;
 }
 
 #programBtn {
@@ -205,6 +271,7 @@ button {
 
 button:hover {
     opacity: 0.9;
+    transform: translateY(-1px);
 }
 
 /* --- Toast Notification --- */
@@ -215,25 +282,33 @@ button:hover {
     right: 20px;
     background-color: #384a32;
     color: #ffffff;
-    padding: 15px 25px;
+    padding: 14px 24px;
     border-radius: 25px;
     border-left: 5px solid #c85a32;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    z-index: 200;
 }
 
 /* --- Footer --- */
 footer {
+    max-width: 1080px;
+    margin: 30px auto 0 auto;
     background-color: #2b3327;
     color: #ffffff;
     text-align: center;
-    padding: 25px;
-    border-radius: 20px;
-    margin-top: 30px;
+    padding: 26px;
+    border-radius: 22px;
+}
+
+footer p {
+    margin: 0 0 10px 0;
 }
 
 .footer-nav a {
     color: #e5ece0;
     text-decoration: none;
     margin: 0 10px;
+    font-size: 0.9rem;
 }
 
 .footer-nav a:hover {

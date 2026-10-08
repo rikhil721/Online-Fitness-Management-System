@@ -1,6 +1,204 @@
 import "./App.css";
+import { supabase } from "./supabaseClient";
 
 function App() {
+
+  // Personal training prices
+  const prices = {
+    strength: 500,
+    weightloss: 450,
+    personal: 800
+  };
+
+  // Trainer for each personal program
+  const trainers = {
+    strength: "Rahul Sharma",
+    weightloss: "Ananya Rao",
+    personal: "Rahul Sharma"
+  };
+
+  // Handle personal booking
+  const handleBooking = async (e) => {
+    e.preventDefault();
+
+    // Get form values
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+
+    const programSelect = document.getElementById("program");
+    const trainerSelect = document.getElementById("trainerSelect");
+    const dateInput = document.getElementById("date");
+    const timeSelect = document.getElementById("time");
+
+    const program = programSelect.value;
+    const trainer = trainerSelect.value;
+    const date = dateInput.value;
+    const time = timeSelect.value;
+
+    // Basic validation
+    if (!name || !email || !program || !trainer || !date || !time) {
+      alert("Please fill all the booking details.");
+      return;
+    }
+
+    // Get price
+    const price = prices[program];
+
+    // -----------------------------------------
+    // 1. CHECK IF TRAINER IS ALREADY BOOKED
+    // -----------------------------------------
+
+    const personalPrograms = [
+      "Strength Training",
+      "Weight Loss",
+      "Personal Training"
+    ];
+
+    const { data: existingBooking, error: checkError } = await supabase
+      .from("bookings")
+      .select("id")
+      .eq("trainer", trainer)
+      .eq("date", date)
+      .eq("time", time)
+      .in("program", personalPrograms)
+      .limit(1);
+
+    if (checkError) {
+      console.error("Error checking booking:", checkError);
+
+      alert("Could not check trainer availability. Please try again.");
+
+      return;
+    }
+
+    // -----------------------------------------
+    // 2. IF ALREADY BOOKED, STOP
+    // -----------------------------------------
+
+    if (existingBooking.length > 0) {
+
+      alert(
+        `${trainer} is already booked on ${date} at ${time}. Please select another time.`
+      );
+
+      return;
+    }
+
+    // -----------------------------------------
+    // 3. SAVE BOOKING TO SUPABASE
+    // -----------------------------------------
+
+    const { data, error } = await supabase
+      .from("bookings")
+      .insert([
+        {
+          name: name,
+          email: email,
+          program:
+            program === "strength"
+              ? "Strength Training"
+              : program === "weightloss"
+              ? "Weight Loss"
+              : "Personal Training",
+          trainer: trainer,
+          date: date,
+          time: time,
+          price: price
+        }
+      ])
+      .select();
+
+    // -----------------------------------------
+    // 4. HANDLE DATABASE ERROR
+    // -----------------------------------------
+
+    if (error) {
+
+      console.error("Booking error:", error);
+
+      // PostgreSQL duplicate error
+      if (error.code === "23505") {
+
+        alert(
+          "Sorry, this trainer was just booked for this time slot."
+        );
+
+      } else {
+
+        alert("Booking failed. Please try again.");
+
+      }
+
+      return;
+    }
+
+    console.log("Booking saved:", data);
+
+    // -----------------------------------------
+    // 5. UPDATE BOOKING SUMMARY
+    // -----------------------------------------
+
+    document.getElementById("summaryName").textContent = name;
+
+    document.getElementById("summaryProgram").textContent =
+      program === "strength"
+        ? "Strength Training"
+        : program === "weightloss"
+        ? "Weight Loss"
+        : "Personal Training";
+
+    document.getElementById("summaryTrainer").textContent = trainer;
+
+    document.getElementById("summaryDate").textContent = date;
+
+    document.getElementById("summaryTime").textContent = time;
+
+    document.getElementById("summaryPrice").textContent = price;
+
+    // -----------------------------------------
+    // 6. SHOW SUCCESS MESSAGE
+    // -----------------------------------------
+
+    const toast = document.getElementById("toast");
+
+    toast.textContent = "Booking Confirmed Successfully!";
+
+    toast.classList.add("show");
+
+    setTimeout(() => {
+      toast.classList.remove("show");
+    }, 3000);
+
+  };
+
+
+  // -----------------------------------------
+  // UPDATE TRAINER WHEN PROGRAM CHANGES
+  // -----------------------------------------
+
+  const handleProgramChange = (e) => {
+
+    const program = e.target.value;
+
+    const trainerSelect = document.getElementById("trainerSelect");
+
+    trainerSelect.innerHTML = `
+      <option value="">Select Trainer</option>
+    `;
+
+    if (program && trainers[program]) {
+
+      const option = document.createElement("option");
+
+      option.value = trainers[program];
+
+      option.textContent = trainers[program];
+
+      trainerSelect.appendChild(option);
+    }
+
+  };
+
 
   return (
     <>
@@ -210,7 +408,10 @@ function App() {
 
             <div className="booking-form">
 
-              <form id="booking-form">
+              <form
+                id="booking-form"
+                onSubmit={handleBooking}
+              >
 
                 <label htmlFor="name">
                   Name
@@ -240,7 +441,11 @@ function App() {
                   Program
                 </label>
 
-                <select id="program" required>
+                <select
+                  id="program"
+                  onChange={handleProgramChange}
+                  required
+                >
 
                   <option value="">
                     Select Program
@@ -265,7 +470,10 @@ function App() {
                   Select Trainer
                 </label>
 
-                <select id="trainerSelect" required>
+                <select
+                  id="trainerSelect"
+                  required
+                >
 
                   <option value="">
                     Select Trainer

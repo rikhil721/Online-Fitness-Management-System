@@ -101,11 +101,9 @@ if (timeInput && dateInput) {
 const bookingForm = document.getElementById("booking-form");
 
 if (bookingForm) {
-    bookingForm.addEventListener("submit", async function(event) {
+    bookingForm.addEventListener("submit", function(event) {
         event.preventDefault();
 
-        const submitBtn = bookingForm.querySelector('button[type="submit"]') || document.getElementById("confirmBookingBtn");
-        
         const name = document.getElementById("name").value.trim();
         const email = document.getElementById("email").value.trim();
         const programValue = programSelect.value;
@@ -118,6 +116,12 @@ if (bookingForm) {
             return;
         }
 
+        const client = getSupabase();
+        if (!client) {
+            alert("Error: Supabase is not connected. Make sure the script tag is in index.html");
+            return;
+        }
+
         const programText = programSelect.options[programSelect.selectedIndex].text;
         const trainerText = trainerSelect.options[trainerSelect.selectedIndex].text;
 
@@ -126,58 +130,64 @@ if (bookingForm) {
         else if (programValue === "weightloss") price = 450;
         else if (programValue === "personal") price = 800;
 
-        // Prevent rapid double-clicks
-        if (submitBtn) submitBtn.disabled = true;
-
-        const client = getSupabase();
-        if (client) {
-            const { data, error } = await client
-                .from("bookings")
-                .insert([
-                    {
-                        name: name,
-                        email: email,
-                        program: programText,
-                        trainer: trainerText,
-                        date: date,
-                        time: time,
-                        price: price
-                    }
-                ]);
-
-            if (error) {
-                if (submitBtn) submitBtn.disabled = false;
-                
-                // PostgreSQL code 23505 = Unique Constraint Violation
-                if (error.code === "23505") {
+        // 1. Check for duplicate booking first
+        client
+            .from("bookings")
+            .select("id")
+            .eq("email", email)
+            .eq("date", date)
+            .eq("time", time)
+            .then(function(checkRes) {
+                if (checkRes.data && checkRes.data.length > 0) {
                     alert("Duplicate booking! You already have a booking scheduled for this date and time.");
-                } else {
-                    alert("Database Error: " + error.message);
+                    return;
                 }
-                return;
-            }
-        }
 
-        // Update UI Summary
-        const sName = document.getElementById("summaryName");
-        if (sName) sName.textContent = name;
-        const sProg = document.getElementById("summaryProgram");
-        if (sProg) sProg.textContent = programText;
-        const sTrain = document.getElementById("summaryTrainer");
-        if (sTrain) sTrain.textContent = trainerText;
-        const sDate = document.getElementById("summaryDate");
-        if (sDate) sDate.textContent = date;
-        const sTime = document.getElementById("summaryTime");
-        if (sTime) sTime.textContent = time;
-        const sPrice = document.getElementById("summaryPrice");
-        if (sPrice) sPrice.textContent = price;
+                // 2. Insert into Supabase
+                client
+                    .from("bookings")
+                    .insert([
+                        {
+                            name: name,
+                            email: email,
+                            program: programText,
+                            trainer: trainerText,
+                            date: date,
+                            time: time,
+                            price: price
+                        }
+                    ])
+                    .then(function(insertRes) {
+                        if (insertRes.error) {
+                            if (insertRes.error.code === "23505") {
+                                alert("Duplicate booking! You already have a booking scheduled for this date and time.");
+                            } else {
+                                alert("Database Error: " + insertRes.error.message);
+                            }
+                            return;
+                        }
 
-        alert("Booking confirmed and successfully saved to Supabase!");
-        showToast("Personal Training Booked Successfully!");
+                        // Update UI Summary
+                        const sName = document.getElementById("summaryName");
+                        if (sName) sName.textContent = name;
+                        const sProg = document.getElementById("summaryProgram");
+                        if (sProg) sProg.textContent = programText;
+                        const sTrain = document.getElementById("summaryTrainer");
+                        if (sTrain) sTrain.textContent = trainerText;
+                        const sDate = document.getElementById("summaryDate");
+                        if (sDate) sDate.textContent = date;
+                        const sTime = document.getElementById("summaryTime");
+                        if (sTime) sTime.textContent = time;
+                        const sPrice = document.getElementById("summaryPrice");
+                        if (sPrice) sPrice.textContent = price;
 
-        bookingForm.reset();
-        trainerSelect.innerHTML = '<option value="">Select Trainer</option>';
-        if (submitBtn) submitBtn.disabled = false;
+                        alert("Booking confirmed and successfully saved to Supabase!");
+                        showToast("Personal Training Booked Successfully!");
+
+                        bookingForm.reset();
+                        trainerSelect.innerHTML = '<option value="">Select Trainer</option>';
+                    });
+            });
     });
 }
 
@@ -188,7 +198,7 @@ if (bookingForm) {
 const groupButtons = document.querySelectorAll(".group-book-btn");
 
 groupButtons.forEach(function(button) {
-    button.addEventListener("click", async function() {
+    button.addEventListener("click", function() {
         const program = button.getAttribute("data-program");
         const day = button.getAttribute("data-day");
         const time = button.getAttribute("data-time");
@@ -214,51 +224,62 @@ groupButtons.forEach(function(button) {
 
         const numericPrice = Number(String(price).replace(/[^0-9.]/g, "")) || 0;
 
-        button.disabled = true;
-
         const client = getSupabase();
         if (client) {
-            const { data, error } = await client
+            // Check duplicate
+            client
                 .from("bookings")
-                .insert([
-                    {
-                        name: name,
-                        email: email,
-                        program: program,
-                        trainer: trainer,
-                        date: sessionDate,
-                        time: displayTime,
-                        price: numericPrice
+                .select("id")
+                .eq("email", email)
+                .eq("date", sessionDate)
+                .eq("time", displayTime)
+                .then(function(checkRes) {
+                    if (checkRes.data && checkRes.data.length > 0) {
+                        alert("Duplicate booking! You already have a booking for this session.");
+                        return;
                     }
-                ]);
 
-            if (error) {
-                button.disabled = false;
-                if (error.code === "23505") {
-                    alert("Duplicate booking! You have already reserved a slot for this session.");
-                } else {
-                    alert("Database Error: " + error.message);
-                }
-                return;
-            }
+                    client
+                        .from("bookings")
+                        .insert([
+                            {
+                                name: name,
+                                email: email,
+                                program: program,
+                                trainer: trainer,
+                                date: sessionDate,
+                                time: displayTime,
+                                price: numericPrice
+                            }
+                        ])
+                        .then(function(insertRes) {
+                            if (insertRes.error) {
+                                if (insertRes.error.code === "23505") {
+                                    alert("Duplicate booking! You already reserved this session.");
+                                } else {
+                                    alert("Database Error: " + insertRes.error.message);
+                                }
+                                return;
+                            }
+
+                            const sName = document.getElementById("summaryName");
+                            if (sName) sName.textContent = name;
+                            const sProg = document.getElementById("summaryProgram");
+                            if (sProg) sProg.textContent = program;
+                            const sTrain = document.getElementById("summaryTrainer");
+                            if (sTrain) sTrain.textContent = trainer;
+                            const sDate = document.getElementById("summaryDate");
+                            if (sDate) sDate.textContent = sessionDate;
+                            const sTime = document.getElementById("summaryTime");
+                            if (sTime) sTime.textContent = displayTime;
+                            const sPrice = document.getElementById("summaryPrice");
+                            if (sPrice) sPrice.textContent = price;
+
+                            alert("Group session booked and saved to Supabase!");
+                            showToast("Group Training Booked Successfully!");
+                        });
+                });
         }
-
-        const sName = document.getElementById("summaryName");
-        if (sName) sName.textContent = name;
-        const sProg = document.getElementById("summaryProgram");
-        if (sProg) sProg.textContent = program;
-        const sTrain = document.getElementById("summaryTrainer");
-        if (sTrain) sTrain.textContent = trainer;
-        const sDate = document.getElementById("summaryDate");
-        if (sDate) sDate.textContent = sessionDate;
-        const sTime = document.getElementById("summaryTime");
-        if (sTime) sTime.textContent = displayTime;
-        const sPrice = document.getElementById("summaryPrice");
-        if (sPrice) sPrice.textContent = price;
-
-        alert("Group session booked and saved to Supabase!");
-        showToast("Group Training Booked Successfully!");
-        button.disabled = false;
     });
 });
 
